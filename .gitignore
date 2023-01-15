@@ -1,0 +1,10 @@
+*.pyc
+.idea/
+.env
+venv/
+__pycache__/
+*.json
+*.txt
+*.csv
+*.db
+!requirements.txt
