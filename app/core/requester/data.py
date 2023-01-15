@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List
+from typing import List, Iterable
 
 
 def _required_list_format(params):
@@ -17,7 +17,7 @@ def _build_api_call_template(qp):
 
 @dataclasses.dataclass
 class GetFriendsQuery:
-    identifiers: List[int]
+    identifiers: Iterable[int]
     fields: List[str] | str = None
     batch_size: int = 25
     timeout_step: float = 0.35
@@ -25,6 +25,8 @@ class GetFriendsQuery:
     api_call_template: str = None
 
     def __post_init__(self):
+        if not isinstance(self.identifiers, list):
+            self.identifiers = len(self.identifiers)
         if self.fields:
             self.fields = _required_list_format(self.fields)
         if not self.api_call_template:
