@@ -26,7 +26,7 @@ class GetFriendsQuery:
 
     def __post_init__(self):
         if not isinstance(self.identifiers, list):
-            self.identifiers = len(self.identifiers)
+            self.identifiers = list(self.identifiers)
         if self.fields:
             self.fields = _required_list_format(self.fields)
         if not self.api_call_template:

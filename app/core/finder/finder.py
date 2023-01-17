@@ -1,5 +1,8 @@
 import asyncio
+import pprint
 from typing import Iterable
+
+from loguru import logger
 
 from app.core.finder.data import HandshakesLevel, HandshakesGraph
 from app.core.requester.data import GetFriendsQuery
@@ -20,14 +23,49 @@ async def get_handshakes_level(identifiers: Iterable, access_token: str):
     return handshakes_level
 
 
-async def find_handshakes(user_id_1: int, user_id_2: int, access_token: str, handshakes_level: int = 3):
+async def find_handshakes(user_id_1: int, user_id_2: int, access_token: str, handshakes_bound: int = 3):
     handshakes_graph_1 = HandshakesGraph()
     handshakes_graph_2 = HandshakesGraph()
-    pass
+    visited = {user_id_1, user_id_2}
+    for level in range(handshakes_bound):
+        logger.info(f"handshakes level: {level}")
+        if level == 0:
+            next_users_1 = [user_id_1]
+            next_users_2 = [user_id_2]
+        else:
+            next_users_1 = handshakes_graph_1.levels[-1].get_children() - visited
+            next_users_2 = handshakes_graph_2.levels[-1].get_children() - visited
+        handshakes_1 = await get_handshakes_level(next_users_1, access_token)
+        handshakes_graph_1.add_to_levels(handshakes_1)
+        common_users = None
+        handshakes_graph_1_found_level = None
+        handshakes_graph_2_found_level = None
+        for handshake_level in handshakes_graph_2.levels:
+            common_users = handshake_level.get_children().intersection(handshakes_1.get_children())
+            if common_users:
+                handshakes_graph_1_found_level = level
+                handshakes_graph_2_found_level = handshakes_graph_2.levels.index(handshake_level)
+                break
+        if not common_users:
+            handshakes_graph_2_found_level = level
+            handshakes_2 = await get_handshakes_level(next_users_2, access_token)
+            handshakes_graph_2.add_to_levels(handshakes_2)
+            for handshake_level in handshakes_graph_1.levels:
+                common_users = handshake_level.get_children().intersection(handshakes_2.get_children())
+                if common_users:
+                    handshakes_graph_1_found_level = handshakes_graph_1.levels.index(handshake_level)
+                    break
+
+        if common_users:
+            answer = []
+            for common_user in common_users:
+                paths_1 = handshakes_graph_1.find_paths_to_child(common_user, handshakes_graph_1_found_level)
+                paths_2 = handshakes_graph_2.find_paths_to_child(common_user, handshakes_graph_2_found_level)
+                for path_1 in paths_1:
+                    for path_2 in paths_2:
+                        answer.append([*reversed(path_1), common_user, *path_2])
+            return answer
 
 
 if __name__ == "__main__":
-    hl: HandshakesLevel = asyncio.run(get_handshakes_level([57300449, 140351546, 103162724], access_token=get_access_token()))
-    for item in hl.get_handshakes():
-        print(item[0], len(item[1]))
-    print(len(hl.get_children()))
+    pass

@@ -64,9 +64,9 @@ class HandshakesGraph:
 
 if __name__ == "__main__":
     l1 = [(1, [2, 3])]
-    l2 = [(2, [1, 4, 5, 6]), (3, [1, 4, 5, 6])]
+    l2 = [(2, [1, 4, 5, 6, 77]), (3, [1, 4, 5, 6])]
     l3 = [(4, [5, 7, 8, 10]), (5, [4, 7, 8, 9]), (6, [10, 11, 12])]
     hg = HandshakesGraph(
         levels=[HandshakesLevel(handshakes=l1), HandshakesLevel(handshakes=l2), HandshakesLevel(handshakes=l3)]
     )
-    print(hg.find_paths_to_child(11, 2))
+    print(hg.find_paths_to_child(77, 1))

@@ -3,6 +3,7 @@ import logging
 
 import aiohttp
 from aiohttp import ClientSession
+from loguru import logger
 
 from app.core.requester.data import GetFriendsQuery
 from app.core.requester.errors import rebuild_queries
@@ -25,7 +26,7 @@ async def _a_get(qp: GetFriendsQuery):
         for qp_batch in qp.get_queries_params_batch():
             timeout += qp.timeout_step
             tasks.append(asyncio.create_task(_a_get_batch(qp_batch, session, timeout)))
-        logging.info(f"generated: {len(tasks)} tasks; approximate time: {timeout} s")
+        logger.info(f"generated: {len(tasks)} tasks; approximate time: {timeout} s")
         return await asyncio.gather(*tasks)
 
 
