@@ -67,5 +67,27 @@ async def find_handshakes(user_id_1: int, user_id_2: int, access_token: str, han
             return answer
 
 
+def find_handshakes_2(user_id_1: int, user_id_2: int, access_token: str, level_bound: int = 3):
+    graph_user_1 = HandshakesGraph()
+    graph_user_2 = HandshakesGraph()
+    graph_user_1.add_to_levels(HandshakesLevel(handshakes=[(None, [user_id_1])]))
+    graph_user_2.add_to_levels(HandshakesLevel(handshakes=[(None, [user_id_2])]))
+    visited_users = set()
+    for level in range(level_bound):
+        users_to_visit_1 = graph_user_1.get_level(-1).get_children() - visited_users
+        visited_users.update(users_to_visit_1)
+
+        users_to_visit_2 = graph_user_2.get_level(-1).get_children() - visited_users
+        visited_users.update(users_to_visit_2)
+
+        handshakes_level_1 = await get_handshakes_level(users_to_visit_1, access_token)
+        handshakes_level_2 = await get_handshakes_level(users_to_visit_2, access_token)
+
+        graph_user_1.add_to_levels(handshakes_level_1)
+        graph_user_2.add_to_levels(handshakes_level_2)
+
+
+
+
 if __name__ == "__main__":
     pass
