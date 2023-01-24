@@ -47,6 +47,9 @@ class HandshakesGraph:
     def get_level(self, level: int):
         return self.levels[level]
 
+    def get_levels(self):
+        return self.levels
+
     def add_to_levels(self, handshakes_level: HandshakesLevel):
         if not handshakes_level.level:
             handshakes_level.level = len(self.levels)
@@ -73,4 +76,4 @@ if __name__ == "__main__":
     hg = HandshakesGraph(
         levels=[HandshakesLevel(handshakes=l0), HandshakesLevel(handshakes=l1), HandshakesLevel(handshakes=l2), HandshakesLevel(handshakes=l3)]
     )
-    print(hg.find_paths_to_child(2, 1))
+    print(hg.find_paths_to_child(1, 0))
