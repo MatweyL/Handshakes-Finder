@@ -1,12 +1,14 @@
 from dataclasses import dataclass, field
 from typing import List, Tuple, Set
 
+from loguru import logger
 
 @dataclass
 class HandshakesLevel:
     level: int = None
     handshakes: List[Tuple[int | None, List[int]]] = field(default_factory=list)
     children: Set[int] = field(default_factory=set)
+    total_friends_number: int = 0
 
     def __post_init__(self):
         if self.handshakes and not self.children:
@@ -16,6 +18,7 @@ class HandshakesLevel:
     def add_to_handshakes(self, handshake: Tuple[int, List[int]]):
         self.handshakes.append(handshake)
         self.children.update(handshake[1])
+        self.total_friends_number += len(handshake[1])
 
     def get_handshakes(self) -> List[Tuple[int, List[int]]]:
         return self.handshakes
